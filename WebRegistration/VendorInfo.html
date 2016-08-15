@@ -1,0 +1,35 @@
+﻿<label class="col-sm-2 control-label">Merchant Details</label>
+<div class="col-sm-10" style="background:#FFFFDD;border:solid blue thin; padding-top:10px">
+    <text-field Name="vendorBusiness" Label="Name of Business" ></text-field>
+    <text-field Name="vendorAddress" Label="Business Address" ></text-field>
+    <text-field Name="vendorPhone" Label="Phone" ></text-field>
+    <text-field Name="vendorEmail" Label="Email" ></text-field>
+
+        <vtext-field Name="maSalesTaxNbr" Label="MA sales Tax Certificate Number" ></vtext-field>
+        <form-msg msg="(All merchants are required to collect and pay MA sales tax. To apply for a number go to: https://wfb.dor.state.ma.us/ )"></form-msg>
+
+    <vtext-field Name="vendorMerchandise" Label="Type of Merchandise (ie: jewelry, clothing, herbal products, instruments, booksets.)" ></vtext-field>
+    <vtext-field Name="vendorHistory" Label="When have you operated as a merchant at Rites of Spring before?" ></vtext-field>
+    <vtext-field Name="vendorSetup" Label="Approximate size of your setup" ></vtext-field>
+
+    <check-box name="donateFlag" label="Do you plan to donate something to the EarthSpirit auction" model="donateFlag"></check-box>
+    <vtext-field ng-show="donateFlag" Name="donateDetail" Label="Please describe your donation and its approximate value" ></vtext-field>
+    <form-msg msg="If you are vending goods or services at Rites of Spring and we receive information about your auction donation before the registration deadline on May 9, we will include it, and information about your booth, in a special program insert. Please be sure to let us know below."></form-msg>
+
+
+    <check-box name="vendorSleeping" label="I would like to apply to sleep in the merchants area" model="vendorSleeping"></check-box>
+    <form-msg msg="(very limited space; tent or smaller vehicle only, please complete the regular housing options)"></form-msg>
+
+	<label>Payment Types Accepted</label>
+    <div class="form-group">
+    	<div class="col-sm-10 checkbox">
+            <label><input value="on" name="barterFlag" type="checkbox">Barter</label>
+            <label><input value="on" name="cashFlag" type="checkbox">Cash</label>
+            <label><input value="on" name="checkFlag" type="checkbox">Check</label>
+            <label><input value="on" name="visamcFlag" type="checkbox">VISA/MC</label>
+            <label><input value="on" name="discoverFlag" type="checkbox">Discover</label>
+            <label><input value="on" name="amexFlag" type="checkbox">American Express</label>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test Posting</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="http://code.angularjs.org/1.5.7/angular.js"></script>
+
+    <script>
+        var myApp = angular.module('TestApp', []);
+
+        myApp.controller('TestCtrlr', function ($http) {
+
+            this.formData = {};
+            this.formData.label = "This is some label values";
+            this.formData.mealPlan = 'one';
+
+
+            this.BtnClick = function () {
+                alert("Button Click");
+            }
+
+
+            this.processForm = function()
+            {
+                $http({
+                    method: 'POST',
+                    url   : 'process.php',
+                    data  : $.param(this.formData),
+                    headers : { 'Content-Type' : 'application/x-www-form-urlencoded' }
+                })
+                .success(function(data)
+                {
+                    console.log(data);
+                })
+            }
+        }
+        );
+    </script>
+</head>
+<body ng-app="TestApp">
+
+    <form ng-controller="TestCtrlr as test">
+        <label><input value="on" name="veggie" type="checkbox" ng-model="test.formData.veggie">Vegetarian</label>
+
+        <br />
+
+    		<label >
+        			<input value="one" name="mealPlanOption" type="radio" ng-model="test.formData.mealPlan"> Option One
+    		</label>
+    		<label >
+        			<input value="two" name="mealPlanOption" type="radio" ng-model="test.formData.mealPlan"> Option Two
+    		</label>
+        <br />
+            <span class="label">Label</span>
+            <span class="formw"><input name="label" maxlength="60" size="60" type="text" ng-model="test.formData.label" required></span>
+        <br />
+        mealPlan={{test.formData.mealPlan}}
+        <button type="button" ng-click="test.processForm()">Submit</button>
+    </form>
+    
+
+</body>
+</html>

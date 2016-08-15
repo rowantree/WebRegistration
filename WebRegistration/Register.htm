@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+
+	<link rel="stylesheet" href="Register_files/additions.css" type="text/css">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+	<title>Registration</title>
+
+	<script src="http://code.angularjs.org/1.5.7/angular.js"></script>
+	<script type="text/javascript" src="RegApp.js"></script>
+	<script type="text/javascript" src="Register_files/common.js"></script>
+	<script type="text/javascript" src="Register_files/register.js"></script>
+	<script type="text/javascript" src="Register_files/CheckCode.js"></script>
+	<script type="text/javascript" src="config.js"></script>
+
+</head>
+
+<body>
+<div ng-app="RegApp">
+
+<div id="JSREQUIRED" ng-hide="true">
+This registration page requires that JavaScript be active!
+</div>
+
+<div ng-controller="RegController as reg">
+<form name="REGISTER" action="confirm.php" method="POST" class="form-horizontal" novalidate ng-submit="SubmitForm(reg.formData)">
+
+	<input value="299" name="calculatedAmount" type="hidden">
+	<input name="priceOverride" value="0" type="hidden">
+	<input readonly="readonly" name="amountDue" value="0.00" type="hidden" width="20">
+
+<div class="visibleDiv">
+	<nobr>
+	Your Cost: ${{reg.formData.calculatedAmount}}
+	</nobr>
+        <button class="btn btn-primary" type="submit">Click Here to register</button>
+</div>
+
+	User Messages:[{{messageBlock}}]
+
+
+<text-field Name="firstName" Label="First Name*" Model="reg.formData.firstName" ></text-field>
+<text-field Name="lastName" Label="Last Name*" Model="reg.formData.lastName" ></text-field>
+<text-field Name="akaName" Label="Preferred*" Model="reg.formData.akaName" ></text-field>
+<text-field Name="address" Label="Address*" Model="reg.formData.address"></text-field>
+<text-field Name="city" Label="City*" Model=reg.formData.city></text-field>
+<option-field Name="state" Label="State*" Values="reg.pl.statesList" Model=reg.formData.state></option-field>
+<text-field Name="country" Label="Country*" Model=reg.formData.country></text-field>
+<text-field Name="zipcode" Label="Zipcode*" Model=reg.formData.zipcode></text-field>
+<text-field Name="email" Label="Email Address*" Model=reg.formData.email></text-field>
+<text-field Name="bestPhone" Label="Best Phone*" Model=reg.formData.bestPhone></text-field>
+<text-field Name="secondPhone" Label="2nd Phone" Model=reg.formData.secondPhone></text-field>
+<rule></rule>
+[{{reg.formData.firstName}} {{reg.formData.lastName}} {{reg.formData.akaName}} {{reg.formData.state}}]
+
+<div class="form-group" id="regOption">
+    <label class="col-sm-2 control-label">Option*</label>
+    <div class="col-sm-10">
+    <div class="radio" ng-repeat="regOption in reg.pl.RegOptions" >
+    	<label >
+    			<input value="{{regOption.Value}}" name="regOption" type="radio" ng-change="ChgRegOption()" ng-model="reg.formData.regOption">
+                {{regOption.Label}}&nbsp;[{{regOption.Cost[0].Price | currency}}]
+            </label>
+    </div>
+    </div>
+</div>
+
+<div class="form-group">
+	<label class="col-sm-2 control-label">Meal Plan*</label>
+	<div class="col-sm-10">
+    	<div class="radio" ng-repeat="ml in reg.mealPlanOptions">
+    		<label >
+        			<input value="{{ml.Value}}" name="mealPlanOption" type="radio" ng-change="ReCalc()" ng-model="reg.formData.mealPlan">
+                    {{ml.Label}}&nbsp;[{{ml.Cost[0].Price | currency}}]
+    		</label>
+    	</div>
+	</div>
+</div>
+
+    regOption={{reg.formData.regOption}} mealPlan={{reg.formData.mealPlan}}
+
+<div class="form-group" ng-show="reg.formData.mealPlan>0">
+	<label class="col-sm-2 control-label">Food Options</label>
+	<div class="col-sm-10 checkbox">
+        <label><input value="on" name="veggie" type="checkbox">Vegetarian</label>
+        <label><input value="on" name="glutten" type="checkbox">Glutten Free</label>
+        <label><input value="on" name="diary" type="checkbox">Dairy Free</label>
+    </div>
+</div>
+
+
+<div class="form-group" ng-show="reg.formData.regOption=='3'">
+    <label class="col-sm-2 control-label">Grove Selection*</label>
+    <div class="col-sm-10">
+	Village Builders are divided into "Groves" to help create the village that is Rites of Spring. Each Grove is based around the creation of a Shrine and also includes other practical tasks. We try to fill the Groves evenly, mixing people of varying abilities and age. Please indicate your first, second, and third Grove choices below.<br />
+        <div ng-repeat="nbr in reg.clanData">
+            Select Clan
+            <select width="50" name="CLAN{{$index}}" ng-model="reg.formData.clanSelection[$index]" ng-change="reg.CheckClans()" ng-required="reg.formData.regOption=='3'">
+                <option value="">Select a grove...</option>
+                <option ng-repeat="grove in reg.pl.groveOptions" value="{{grove.Value}}">{{grove.Label}}</option>
+            </select>
+            <br />
+        </div>
+        <div class="alert-warning">{{reg.clanSelectionMsg}}</div>
+    </div>
+</div>
+    <hr>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Additional</label>
+    <div class="col-sm-10">
+    	Children Registering with the adult registering above: <button class="btn" type="button" ng-click="reg.AddChild()">Add Child</button>
+
+		<table class="table table-hover" ng-show="reg.formData.children.length > 0">
+		<tbody>
+            <tr>
+				<td><br>First Name</td>
+    			<td><br>Last Name</td>
+				<td><br>Gender</td>
+				<td><br>Age</td>
+    			<td ng-show="reg.formData.mealPlan>0">Meal<br>Plan</td>
+                <td ng-show="reg.formData.mealPlan>0"><br>Vegetarian</td>
+            </tr>
+
+            <tr ng-repeat="child in reg.formData.children">
+                <td class="input"><input name="fname{{$index}}" maxlength="20" size="10" type="text" required></td>
+                <td class="input"><input name="lname{{$index}}" maxlength="20" size="10" type="text" required></td>
+                <td class="input"><select name="gender{{$index}}" required>
+                    <option selected="selected" value="N/A">select...</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Prefer Not To Say</option>
+                    </select></td>
+                <td class="input">
+                    <select name="age{{$index}}" onchange="CalcAmountDue(false)" required>
+                        <option selected="selected" value="N/A">select...</option>
+                        <option ng-repeat="age in reg.ageData" value="{{age}}">{{age}}</option>
+                    </select></td>
+                <td class="input"><input value="on" name="mealPlan{{$index}}" type="checkbox" ng-show="reg.formData.mealPlan>0" ng-model="child.mealPlan"></td>
+                <td class="input"><input value="on" name="veggie{{$index}}"   type="checkbox" ng-show="reg.formData.mealPlan>0 && child.mealPlan" ng-model="child.veggie"></td>
+                <td><button class="btn btn-sm" type="button" ng-click="reg.RemoveChild(child)">Remove</button></td>
+            </tr>
+
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<rule></rule>
+
+
+<div class="form-group" ng-show="reg.formData.mealPlan>0">
+	<label class="col-sm-2 control-label">General Options</label>
+	<div class="col-sm-10 checkbox">
+        <check-box name="firstros" model="reg.formData.firstros" label="This is my first Rites of Spring"></check-box>
+        <check-box name="EmailList" model="reg.formData.emailList" label="Please check here if you do not want to be added to the EarthSpirit event e-mail list"></check-box>
+        <check-box name="medical" model="reg.formData.medical" label="Are you a trained medical person (Nurse, MD, EMT, etc)"></check-box>
+        <text-field Name="qualifications" Label="Qualifications*" ng-show="reg.formData.medical" Model=reg.formData.qualifications></text-field>
+        <check-box name="vendor" model="reg.formData.vendor" label="I would like to be a merchant at Rites of Spring"></check-box>
+    </div>
+</div>
+
+<vendor-info ng-show="reg.formData.vendor"></vendor-info>
+
+<rule></rule>
+
+<radio-options Name="housing" Values="reg.pl.housingOptions" Model="reg.formData.housing" Label="Housing" Change="ReCalc()"></radio-options>
+
+<div class="form-group" ng-show="reg.formData.housing=='tent'">
+    <label class="col-sm-2 control-label">&nbsp;</label>
+	<div class="col-sm-10">No RVs or Pop-ups are permitted</div>
+</div>
+
+<div class="form-group" ng-show="reg.formData.housing!='tent'">
+	<label class="col-sm-2 control-label">Special Requests (we will try to accomodate)</label>
+	<div class="col-sm-10" style="border: solid thin blue">
+        <radio-options Name="housingGender" Values="reg.pl.housingGenderOptions" Model="reg.formData.housingGender" Label="Gender Preferences"></radio-options>
+        <radio-options Name="noisePreference" Values="reg.pl.housingAreaOptions" Model="reg.formData.housingArea" Label="Preferred Housing"></radio-options>
+        <check-box name="substance" model="reg.formData.substance" label="Substance Free"></check-box>
+    </div>
+</div>
+
+<div class="form-group" ng-show="reg.formData.housing!='tent'">
+	<label class="col-sm-2 control-label">Other People in party</label>
+	<div class="col-sm-10">
+	If you want to be housed in a group with your family/friends then please select a name for your group and enter that here.
+	Group Name: <input maxlength="10" size="10" name="group_name" type="text"><br>
+	<p>Please enter the names of all the other adults and children in your 
+group in the box below.  Each person in this group should enter this 
+list on their registration as it helps us keep track of your group 
+members.  Each person in your group will have to register as they 
+normally would. This list is for housing assignment only.</p>
+	
+	<textarea class="form-control" name="otherNames" rows="5" cols="60"></textarea></div>
+</div>
+
+<rule></rule>
+    
+<div class="form-group">
+    <label class="col-sm-2 control-label">Special Needs</label>
+    <div class="col-sm-10"><textarea class="form-control" name="needs" rows="10"></textarea></div>
+</div>
+
+<rule></rule>
+
+<div class="form-group">
+        Conditions for Registration - Please Read Carefully
+<ol>
+ 
+<li>Rites of Spring is a private function. It is off-limits to media 
+personnel acting in a professional capacity, unless consent from the 
+organization has been secured in writing. This is to ensure 
+confidentiality for those who desire it.</li>
+<li>Tamelin Productions reserves the right to revoke admission without 
+refund on an individual basis if necessary due to dangerous or 
+disruptive behavior or failure to abide by gathering policies.</li>
+<li>I have read and understand the full information booklet and/or web 
+site and I agree to the Rites of Spring policies and conditions for 
+registration, cancellation, refunds and  as described.</li>
+<li>I agree to be responsible for the behavior, safety and adherence to the above for all children listed on this registration form.</li>
+<li>I agree to hold harmless Tamelin Productions, EarthSpirit, their 
+members, staff and volunteers, and the owners and staff of the gathering
+ site from any responsibility for personal injury or loss or damage to 
+personal property incurred by myself or my children during Rites of 
+Spring.</li>
+</ol>
+</div>
+
+<rule></rule>
+
+<check-box-field name="waiverSigned" model="reg.formData.substance" label="Waiver of Liability*" prompt="I agree to the conditions for registration, cancellation, refunds, and Rites of Spring policies as described above. I agree to read the full information booklet or website before arrival."></check-box-field>
+
+<rule></rule>
+
+<option-field Label="Payment Method*" Name="paymentType" Values="reg.pl.paymentTypeOptions" Model="reg.formData.paymentType"></option-field>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Scholarship Donation</label>
+    <div class="col-sm-10">$<input name="schfund" onchange="CalcAmountDue(false)" value="0" type="text">&nbsp;Event $1 is helpful!</div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Special</label>
+    <div class="col-sm-10">
+        <check-box name="discountCheckBox" model="reg.formData.haveDiscountCode" label="I have a discount code"></check-box>
+        <div id="CouponDiv" ng-show="reg.formData.haveDiscountCode">&nbsp;<input id="coupon" name="coupon" type="text">&nbsp;<a href="#" onclick="CheckCoupon(); return false;">Apply</a></div></div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">&nbsp;</label>
+    <div class="col-sm-10">
+        <button class="btn btn-primary" type="submit";>Click Here to register</button>
+        <button class="btn btn-primary" ng-click="ResetPage()" type="button";>Reset</button>
+    </div>
+</div>
+
+<rule></rule>
+
+	<input name="age" value="0" type="hidden">
+	<input name="ageCode" value="0" type="hidden">
+	<input name="page" value="register.php" type="hidden">
+	<input name="earlyBird" value="" type="hidden">
+	<input name="configFile" value="late_register.php" type="hidden">
+
+</form>
+<p class="footer">©2015 Tamelin Productions and EarthSpirit</p>
+
+
+	</div>
+</div>
+
+</body></html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+
+	<link rel="stylesheet" href="test_files/additions.css" type="text/css">
+
+	<title>Rites of Spring 2016: Registration</title>
+
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+	<script type="text/javascript" src="test.js"></script>
+	<script type="text/javascript" src="test_files/common.js"></script>
+	<script type="text/javascript" src="test_files/register.js"></script>
+	<script type="text/javascript" src="test_files/CheckCode.js"></script>
+
+	<script type="text/javascript">
+	var speakerFlag = false;
+var vendorFlag = false;
+var staffFlag = false;
+var pl = {
+	"memberDiscount" : 5,
+	"heatedCabinFee" : 60,
+	"baseFee" : Array(Array(0,17,150,120,200,0),
+Array(0,99,299,230,399,0),
+0),
+	"mealPlanFee" : Array(Array(1,12,90,75,90,0),
+Array(1,99,175,125,175,0),
+Array(2,12,55,-1,55,0),
+Array(2,99,85,-1,85,0),
+0),
+	"optionscnt" : 0,
+	"adultAge" : 18,
+	"teenAge" : 13,
+	"childAge" : 5,
+	"childDiscount" : 0,
+	"vendorFee" : -100,
+	"maxPayingChildren" : 2,
+	"masqueOption" : 0,
+	"masqueCost" : 0,
+	"optionDiscountAge" : 12,
+	"debug" : 0,
+	"vendor" : 0,
+	"clanSelectionName" : 'grove',
+	"clanSelectionCnt" : 3,
+	"operation" : '',
+	"event" : 'Rites'
+}
+	var subRegSize = 4;
+var fieldList = new Array (
+[ 'First Name*', 'firstName', 'text', '60' ],
+[ 'Last Name*', 'lastName', 'text', '60' ],
+[ 'Preferred Name', 'akaName', 'text', '60' ],
+[ 'Address*', 'address', 'text', '60' ],
+[ 'City*', 'city', 'text', '60' ],
+[ 'State*', 'state', 'StateList', '2' ],
+[ 'Country', 'country', 'text', '60' ],
+[ 'Zipcode*', 'zipcode', 'text', '10' ],
+[ 'Email Address*', 'email', 'text', '60' ],
+[ 'Best Phone*', 'bestPhone', 'text', '20' ],
+[ '2nd Phone', 'secondPhone', 'text', '20' ],
+[ '', '', 'hr', '' ],
+[ 'Option*', 'regOption', 'radioList', 'SelectOption()' ],
+[ '', '', 'hr', '' ],
+[ 'Grove', '', 'CLAN_SELECTION', '' ],
+[ 'Meal Plan', 'mealPlanOption', 'radioList', 'toggleMealPlan(0)' ],
+[ 'Vegetarian', 'veggie', 'check', '' ],
+[ '', '', 'hr', '' ],
+[ '', '', 'ADD_REGS', '' ],
+[ '', '', 'hr', '' ],
+[ 'This is my first Rites of Spring', 'firstros', 'rcheck', '' ],
+[ 'Please check here if you do <b>not</b> want to be added to the EarthSpirit event e-mail list', 'EmailList', 'rcheck', '' ],
+[ 'I would like to be a merchant at Rites of Spring', 'vendor', 'rcheck', 'toggleVendor()' ],
+[ '', '', 'VENDOR_DETAIL', '' ],
+[ '', '', 'hr', '' ],
+[ 'Are you a trained medical person (Nurse, MD, EMT, etc)', 'medical', 'rcheck', 'toggleMedical()' ],
+[ 'Qualifications', 'qualifications', 'textarea', '60' ],
+[ '', '', 'hr', '' ],
+[ 'Housing', 'housing', 'radio', 'toggleHousing()' ],
+[ '', '', 'CABIN_DETAIL', '' ],
+[ '', '', 'hr', '' ],
+[ 'Special Needs', 'needs', 'textarea', '60' ],
+[ '', '', 'hr', '' ],
+[ null ]
+);
+
+	function ebYes()
+	{
+		document.getElementById("ebnotice").style.display = 'none';
+	}
+
+	function ebNo()
+	{
+		document.getElementById("ebnotice").innerHTML = "Sorry, please come back when regular registration opens. That should be in early March";
+	}
+
+	</script>
+
+</head>
+
+<body onload="start()">
+<div ng-app ng-init="qty=23; regOption=2; mealPlan=2">
+	<div ng-controller="RegController">
+
+<div style="display: none;" id="JSREQUIRED">
+This registration page requires that JavaScript be active!
+</div>
+
+<form name="REGISTER" action="confirm.php" method="POST" onsubmit="return false;">
+
+
+	<input type="number" ng-model="qty">
+	{{qty | currency}}
+	RegOption={{regOption}}
+	mealPlan={{mealPlan}}
+
+<table>
+<tbody>
+
+<tr id="firstName"><td class="label">First Name*</td><td class="input"><input name="firstName" maxlength="60" size="60" type="text"></td></tr>
+<tr id="lastName"><td class="label">Last Name*</td><td class="input"><input name="lastName" maxlength="60" size="60" type="text"></td></tr>
+<tr id="akaName"><td class="label">Preferred Name</td><td class="input"><input name="akaName" maxlength="60" size="60" type="text"></td></tr>
+<tr id="address"><td class="label">Address*</td><td class="input"><input name="address" maxlength="60" size="60" type="text"></td></tr>
+<tr id="city"><td class="label">City*</td><td class="input"><input name="city" maxlength="60" size="60" type="text"></td></tr>
+<tr><td class="label">State*</td><td class="input"><select name="state" id="state">
+<option selected="selected">select ...</option><option value="AB">Alberta</option>
+<option value="CA">California</option>
+<option value="CO">Colorado</option>
+<option value="CT">Connecticut</option>
+</select></td>
+</tr>
+<tr id="country"><td class="label">Country</td><td class="input"><input name="country" maxlength="60" size="60" type="text"></td></tr>
+<tr id="zipcode"><td class="label">Zipcode*</td><td class="input"><input name="zipcode" maxlength="10" size="10" type="text"></td></tr>
+<tr id="email"><td class="label">Email Address*</td><td class="input"><input name="email" maxlength="60" size="60" type="text"></td></tr>
+<tr id="bestPhone"><td class="label">Best Phone*</td><td class="input"><input name="bestPhone" maxlength="20" size="20" type="text"></td></tr>
+<tr id="secondPhone"><td class="label">2nd Phone</td><td class="input"><input name="secondPhone" maxlength="20" size="20" type="text"></td></tr>
+
+
+
+<tr>
+	<td class="label">Amount Due</td>
+	<td id="AmountDue">$<input readonly="readonly" name="amountDue" value="299.00" type="text">
+		<!-- These are for the debug process -->
+	<input value="299" name="calculatedAmount" type="hidden">
+	<input name="priceOverride" value="0" type="hidden">
+	</td>
+</tr>
+
+
+
+<tr><td colspan="2"><hr></td></tr>
+
+<tr>
+	<td class="label">Option*</td>
+	<td id="regOption" class="input">
+		<input checked="checked" value="1" id="regOption1" name="regOption" onclick="SelectOption()" type="radio" ng-model="regOption">
+		<label for="regOption1">Full Rites of Spring (Wed to Mon)</label>&nbsp;
+		<span id="lblregOption1" name="lblregOption1">$299</span>
+		<br>
+		<input value="2" id="regOption2" name="regOption" onclick="SelectOption()" type="radio" ng-model="regOption">
+		<label for="regOption2">Weekend Only (Fri to Mon)</label>&nbsp;
+		<span id="lblregOption2" name="lblregOption2">$230</span>
+		<br>
+		<input value="3" id="regOption3" name="regOption" onclick="SelectOption()" type="radio" ng-model="regOption">
+		<label for="regOption3">Village Builders (with Full Rites of Spring)</label>&nbsp;
+		<span id="lblregOption3" name="lblregOption3">$399</span>
+		<br>
+	</td>
+</tr>
+
+<tr><td colspan="2"><hr></td></tr>
+
+<tr style="display: none;" id="CLANSELECTION">
+	<td class="label">Grove Selection*</td>
+	<td>Village
+ Builders are divided into "Groves" to help create the village that is 
+Rites of Spring. Each Grove is based around the creation of a Shrine and
+ also includes other practical tasks. We try to fill the Groves evenly, 
+mixing people of varying abilities and age. Please indicate your first, 
+second, and third Grove choices below.<br><!-- Clan 0 Selected Clan is '' -->
+<select width="50" name="CLAN0" onchange="ToggleClanNotes(0)"><option selected="selected" value="">select a Grove...</option><option>Stone (includes Torches; Healers Hall)</option><option>Green Ones (includes tent set up; Gates)</option><option>Fire (includes prep at ritual fire circle; wood cutting)</option><option>Lake (includes merchant area prep; workshop spaces)</option><option>Heart (includes Registration prep; Center Fire and Dining Hall lighting)</option><option>Inspiration (includes workshop spaces; Sara Cooper set up)</option></select><div id="CLAN_NOTES0" style="display:none"><br><textarea name="CLAN_MSG0" rows="10" cols="60"></textarea></div><br><br><!-- Clan 1 Selected Clan is '' -->
+<select width="50" name="CLAN1" onchange="ToggleClanNotes(1)"><option selected="selected" value="">select a Grove...</option><option>Stone (includes Torches; Healers Hall)</option><option>Green Ones (includes tent set up; Gates)</option><option>Fire (includes prep at ritual fire circle; wood cutting)</option><option>Lake (includes merchant area prep; workshop spaces)</option><option>Heart (includes Registration prep; Center Fire and Dining Hall lighting)</option><option>Inspiration (includes workshop spaces; Sara Cooper set up)</option></select><div id="CLAN_NOTES1" style="display:none"><br><textarea name="CLAN_MSG1" rows="10" cols="60"></textarea></div><br><br><!-- Clan 2 Selected Clan is '' -->
+<select width="50" name="CLAN2" onchange="ToggleClanNotes(2)"><option selected="selected" value="">select a Grove...</option><option>Stone (includes Torches; Healers Hall)</option><option>Green Ones (includes tent set up; Gates)</option><option>Fire (includes prep at ritual fire circle; wood cutting)</option><option>Lake (includes merchant area prep; workshop spaces)</option><option>Heart (includes Registration prep; Center Fire and Dining Hall lighting)</option><option>Inspiration (includes workshop spaces; Sara Cooper set up)</option></select><div id="CLAN_NOTES2" style="display:none"><br><textarea name="CLAN_MSG2" rows="10" cols="60"></textarea></div><br><br></td></tr>
+
+<tr>
+	<td class="label">Meal Plan</td>
+	<td id="mealPlanOption" class="input">
+		<input value="0" id="mealPlanOption0" name="mealPlanOption" onclick="toggleMealPlan(0)" checked="checked" type="radio" ng-model="mealPlan">
+		<label for="mealPlanOption0">None</label>&nbsp;<span id="lblmealPlanOption0" name="lblmealPlanOption0">$0</span><br>
+		<input value="1" id="mealPlanOption1" name="mealPlanOption" onclick="toggleMealPlan(0)" type="radio" ng-model="mealPlan">
+		<label for="mealPlanOption1">Full</label>&nbsp;<span id="lblmealPlanOption1" name="lblmealPlanOption1">$175</span><br>
+		<input value="2" id="mealPlanOption2" name="mealPlanOption" onclick="toggleMealPlan(0)" type="radio" ng-model="mealPlan">
+		<label for="mealPlanOption2">Dinner Only</label>&nbsp;<span id="lblmealPlanOption2" name="lblmealPlanOption2">$85</span><br>
+	</td>
+</tr>
+
+<tr style="display: none;" id="veggie">
+	<td class="label">Vegetarian</td>
+	<td class="input"><input value="on" name="veggie" type="checkbox"></td>
+</tr>
+
+<tr><td colspan="2"><hr></td></tr>
+
+<tr>
+	<td class="label" colspan="2">Children Registering with the adult registering above: (Check an "Include" box for each person you want to register)</td>
+</tr>
+
+<tr id="additionalRegistrations">
+	<td colspan="2">
+		<table>
+		<tbody><tr>
+			<td class="label"><br>Include</td>
+						<td class="label"><br>First Name</td>
+			<td class="label"><br>Last Name</td>
+							<td class="label"><br>Gender</td>
+						<td class="label"><br>Age</td>
+			<td class="label">Meal<br>Plan</td><td class="label" id="VEGGIE_HDR"><br>Vegetarian</td>					</tr>
+		<tr><td id="ADDREG1" class="input"><input value="on" name="ADDREG1" onclick="UpdateForm()" type="checkbox"></td><td style="visibility: hidden;" id="fname1" class="input"><input name="fname1" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="lname1" class="input"><input name="lname1" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="gender1" class="input"><select name="gender1"><option selected="selected" value="N/A">select...</option>
+<option>Male</option>
+<option>Female</option>
+<option>Prefer Not To Say</option>
+</select></td><td style="visibility: hidden;" id="age1" class="input"><select name="age1" onchange="CalcAmountDue(false)"><option selected="selected" value="N/A">select...</option>
+<option value="1">0</option>
+<option value="2">1</option>
+<option value="3">2</option>
+<option value="4">3</option>
+<option value="5">4</option>
+<option value="6">5</option>
+<option value="7">6</option>
+<option value="8">7</option>
+<option value="9">8</option>
+<option value="10">9</option>
+<option value="11">10</option>
+<option value="12">11</option>
+<option value="13">12</option>
+<option value="14">13</option>
+<option value="15">14</option>
+<option value="16">15</option>
+<option value="17">16</option>
+<option value="18">17</option>
+</select></td><td style="visibility: hidden;" id="mealPlan1" class="input"><input value="on" name="mealPlan1" onclick="toggleMealPlan(1);" type="checkbox"></td><td style="visibility: hidden;" id="veggie1" class="input"><input value="on" name="veggie1" type="checkbox"></td></tr><tr><td id="ADDREG2" class="input"><input value="on" name="ADDREG2" onclick="UpdateForm()" type="checkbox"></td><td style="visibility: hidden;" id="fname2" class="input"><input name="fname2" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="lname2" class="input"><input name="lname2" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="gender2" class="input"><select name="gender2"><option selected="selected" value="N/A">select...</option>
+<option>Male</option>
+<option>Female</option>
+<option>Prefer Not To Say</option>
+</select></td><td style="visibility: hidden;" id="age2" class="input"><select name="age2" onchange="CalcAmountDue(false)"><option selected="selected" value="N/A">select...</option>
+<option value="1">0</option>
+<option value="2">1</option>
+<option value="3">2</option>
+<option value="4">3</option>
+<option value="5">4</option>
+<option value="6">5</option>
+<option value="7">6</option>
+<option value="8">7</option>
+<option value="9">8</option>
+<option value="10">9</option>
+<option value="11">10</option>
+<option value="12">11</option>
+<option value="13">12</option>
+<option value="14">13</option>
+<option value="15">14</option>
+<option value="16">15</option>
+<option value="17">16</option>
+<option value="18">17</option>
+</select></td><td style="visibility: hidden;" id="mealPlan2" class="input"><input value="on" name="mealPlan2" onclick="toggleMealPlan(2);" type="checkbox"></td><td style="visibility: hidden;" id="veggie2" class="input"><input value="on" name="veggie2" type="checkbox"></td></tr><tr><td id="ADDREG3" class="input"><input value="on" name="ADDREG3" onclick="UpdateForm()" type="checkbox"></td><td style="visibility: hidden;" id="fname3" class="input"><input name="fname3" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="lname3" class="input"><input name="lname3" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="gender3" class="input"><select name="gender3"><option selected="selected" value="N/A">select...</option>
+<option>Male</option>
+<option>Female</option>
+<option>Prefer Not To Say</option>
+</select></td><td style="visibility: hidden;" id="age3" class="input"><select name="age3" onchange="CalcAmountDue(false)"><option selected="selected" value="N/A">select...</option>
+<option value="1">0</option>
+<option value="2">1</option>
+<option value="3">2</option>
+<option value="4">3</option>
+<option value="5">4</option>
+<option value="6">5</option>
+<option value="7">6</option>
+<option value="8">7</option>
+<option value="9">8</option>
+<option value="10">9</option>
+<option value="11">10</option>
+<option value="12">11</option>
+<option value="13">12</option>
+<option value="14">13</option>
+<option value="15">14</option>
+<option value="16">15</option>
+<option value="17">16</option>
+<option value="18">17</option>
+</select></td><td style="visibility: hidden;" id="mealPlan3" class="input"><input value="on" name="mealPlan3" onclick="toggleMealPlan(3);" type="checkbox"></td><td style="visibility: hidden;" id="veggie3" class="input"><input value="on" name="veggie3" type="checkbox"></td></tr><tr><td id="ADDREG4" class="input"><input value="on" name="ADDREG4" onclick="UpdateForm()" type="checkbox"></td><td style="visibility: hidden;" id="fname4" class="input"><input name="fname4" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="lname4" class="input"><input name="lname4" maxlength="20" size="20" type="text"></td><td style="visibility: hidden;" id="gender4" class="input"><select name="gender4"><option selected="selected" value="N/A">select...</option>
+<option>Male</option>
+<option>Female</option>
+<option>Prefer Not To Say</option>
+</select></td><td style="visibility: hidden;" id="age4" class="input"><select name="age4" onchange="CalcAmountDue(false)"><option selected="selected" value="N/A">select...</option>
+<option value="1">0</option>
+<option value="2">1</option>
+<option value="3">2</option>
+<option value="4">3</option>
+<option value="5">4</option>
+<option value="6">5</option>
+<option value="7">6</option>
+<option value="8">7</option>
+<option value="9">8</option>
+<option value="10">9</option>
+<option value="11">10</option>
+<option value="12">11</option>
+<option value="13">12</option>
+<option value="14">13</option>
+<option value="15">14</option>
+<option value="16">15</option>
+<option value="17">16</option>
+<option value="18">17</option>
+</select></td><td style="visibility: hidden;" id="mealPlan4" class="input"><input value="on" name="mealPlan4" onclick="toggleMealPlan(4);" type="checkbox"></td><td style="visibility: hidden;" id="veggie4" class="input"><input value="on" name="veggie4" type="checkbox"></td></tr>		</tbody></table>
+
+	</td>
+</tr>
+
+<tr><td colspan="2"><hr></td></tr><tr id="firstros"><td colspan="2" style="text-align:left"><input value="on" name="firstros" type="checkbox">&nbsp;This is my first Rites of Spring</td></tr>
+<tr id="EmailList"><td colspan="2" style="text-align:left"><input value="on" name="EmailList" type="checkbox">&nbsp;Please check here if you do <b>not</b> want to be added to the EarthSpirit event e-mail list</td></tr>
+<tr id="vendor"><td colspan="2" style="text-align:left"><input value="on" name="vendor" onclick="toggleVendor()" type="checkbox">&nbsp;I would like to be a merchant at Rites of Spring</td></tr>
+<tr style="display: none;" id="VENDOR_DETAIL">
+	<td class="label">Merchant Details</td>
+	<td>
+	<table style="background:#FFFFDD;border:solid red thin">
+<tbody><tr id="vendorBusiness"><td class="label">*Name of Business</td><td class="input"><input name="vendorBusiness" maxlength="60" size="60" type="text"></td></tr>
+<tr id="vendorAddress"><td class="label">*Business Address</td><td class="input"><input name="vendorAddress" maxlength="60" size="60" type="text"></td></tr>
+<tr id="vendorPhone"><td class="label">*Phone</td><td class="input"><input name="vendorPhone" maxlength="60" size="60" type="text"></td></tr>
+<tr id="vendorEmail"><td class="label">*Email</td><td class="input"><input name="vendorEmail" maxlength="60" size="60" type="text"></td></tr>
+<tr id="maSalesTaxNbr"><td class="label">*MASales Tax certificate number</td><td class="input"><input name="maSalesTaxNbr" maxlength="20" size="20" type="text"></td></tr>
+<tr id="TaxIdMsg"><td></td><td><span style="background:#d8d8d8;font-style:italic">(All merchants are required to collect and pay MA sales tax. To apply for a number go to: https://wfb.dor.state.ma.us/ )</span></td></tr><tr><td colspan="2"><hr></td></tr><tr id="tr_vendorMerchandise"><td class="label">*Type of merchandise (ie: jewelry, clothing, herbal products, instruments, booksets.)</td><td id="vendorMerchandise" class="input"><textarea name="vendorMerchandise" cols="60" rows="10"></textarea></td></tr>
+<tr><td colspan="2"><hr></td></tr><tr id="donateMsg"><td></td><td><span style="background:#d8d8d8;font-style:italic">If you are vending goods or services at Rites of Spring and we 
+			receive information about your auction donation before the registration 
+			deadline on May 9,<br>
+			we will include it, and information about your booth, in a special program insert.
+			Please be sure to let us know below.</span></td></tr><tr id="donateFlag"><td class="label">Do you plan to donate something to the EarthSpirit auction?</td><td class="input"><input value="on" name="donateFlag" onclick="toggleDonation()" type="checkbox"></td></tr>
+<tr style="display: none;" id="tr_donateDetail"><td class="label">Please describe your donation and its approximate value</td><td id="donateDetail" class="input"><textarea name="donateDetail" cols="60" rows="10"></textarea></td></tr>
+<tr><td colspan="2"><hr></td></tr><tr id="tr_vendorSetup"><td class="label">*Approximate size of your setup</td><td id="vendorSetup" class="input"><textarea name="vendorSetup" cols="60" rows="10"></textarea></td></tr>
+<tr><td colspan="2"><hr></td></tr><tr id="vendorHistory"><td class="label">*When have you operated as a merchant at Rites of Spring before?</td><td class="input"><input name="vendorHistory" maxlength="30" size="30" type="text"></td></tr>
+<tr><td colspan="2"><hr></td></tr><tr id="vendorSleeping"><td class="label">I would like to apply to sleep in the merchants area</td><td class="input"><input value="on" name="vendorSleeping" type="checkbox"></td></tr>
+<tr id="TestMsg"><td></td><td><span style="background:#d8d8d8;font-style:italic">(very limited space; tent or smaller vehicle only, please complete the regular housing options)</span></td></tr><tr><td colspan="2"><hr></td></tr><tr><td class="label">Payment Types Accepted</td><td><table><tbody><tr><td id="barterFlag" class="input"><input value="on" name="barterFlag" type="checkbox"></td><td>Barter</td><td id="cashFlag" class="input"><input value="on" name="cashFlag" type="checkbox"></td><td>Cash</td></tr><tr><td id="checkFlag" class="input"><input value="on" name="checkFlag" type="checkbox"></td><td>Check</td><td id="visamcFlag" class="input"><input value="on" name="visamcFlag" type="checkbox"></td><td>VISA/MC</td></tr><tr><td id="discoverFlag" class="input"><input value="on" name="discoverFlag" type="checkbox"></td><td>Discover</td><td id="amexFlag" class="input"><input value="on" name="amexFlag" type="checkbox"></td><td>American Express</td></tr></tbody></table></td></tr>	</tbody></table>
+	</td>
+</tr>
+<tr><td colspan="2"><hr></td></tr><tr id="medical"><td colspan="2" style="text-align:left"><input value="on" name="medical" onclick="toggleMedical()" type="checkbox">&nbsp;Are you a trained medical person (Nurse, MD, EMT, etc)</td></tr>
+<tr style="display: none;" id="tr_qualifications"><td class="label">Qualifications</td><td id="qualifications" class="input"><textarea name="qualifications" cols="60" rows="10"></textarea></td></tr>
+<tr><td colspan="2"><hr></td></tr><tr><td class="label">Housing</td><td id="housing" class="input"><input value="My Tent" id="housing1" name="housing" onclick="toggleHousing()" type="radio"><label for="housing1">My Tent</label>&nbsp;&nbsp;<input value="a Cabin" id="housing2" name="housing" onclick="toggleHousing()" type="radio"><label for="housing2">a Cabin</label>&nbsp;&nbsp;<input value="Rustic Cabin" id="housing3" name="housing" onclick="toggleHousing()" type="radio"><label for="housing3">Rustic Cabin</label>&nbsp;&nbsp;<input value="Heated Space($60)" id="housing4" name="housing" onclick="toggleHousing()" type="radio"><label for="housing4">Heated Space($60)</label>&nbsp;&nbsp;</td></tr>
+<tr style="display: none;" id="RVNOTICE">
+	<td></td>
+	<td>No RVs or Pop-ups are permitted</td>
+</tr>
+<tr id="CABIN_REQUEST">
+	<td class="label">Special Requests (we will try to accomodate)</td>
+	<td>
+		<table>
+	<tbody><tr><td class="label">Gender Preference</td><td id="housingGender" class="input"><input value="1" id="housingGender1" name="housingGender" checked="checked" type="radio"><label for="housingGender1">No Preference</label>&nbsp;&nbsp;<input value="2" id="housingGender2" name="housingGender" type="radio"><label for="housingGender2">All-Female</label>&nbsp;&nbsp;<input value="3" id="housingGender3" name="housingGender" type="radio"><label for="housingGender3">All-Male</label>&nbsp;&nbsp;</td></tr>
+<tr><td class="label">Preferred Housing Area</td><td id="noisePreference" class="input"><input value="1" id="noisePreference1" name="noisePreference" checked="checked" type="radio"><label for="noisePreference1">No Preference</label>&nbsp;&nbsp;<input value="2" id="noisePreference2" name="noisePreference" type="radio"><label for="noisePreference2">Quiet</label>&nbsp;&nbsp;<input value="3" id="noisePreference3" name="noisePreference" type="radio"><label for="noisePreference3">Late Night</label>&nbsp;&nbsp;<input value="4" id="noisePreference4" name="noisePreference" type="radio"><label for="noisePreference4">Family</label>&nbsp;&nbsp;</td></tr>
+<tr id="substance"><td class="label">Substance Free</td><td class="input"><input value="on" name="substance" type="checkbox"></td></tr>
+		</tbody></table>
+	</td>
+</tr>
+<tr id="CABIN_GROUP">
+	<td class="label">Other People in party</td>
+	<td>
+	<p>If you want to be housed in a group with your family/friends then please select a name for your group and enter that here.</p>
+	Group Name: <input maxlength="10" size="10" name="group_name" type="text"><br>
+	<p>Please enter the names of all the other adults and children in your 
+group in the box below.  Each person in this group should enter this 
+list on their registration as it helps us keep track of your group 
+members.  Each person in your group will have to register as they 
+normally would. This list is for housing assignment only.</p>
+	
+	<textarea name="otherNames" rows="5" cols="60"></textarea></td>
+</tr>
+
+
+<tr><td colspan="2"><hr></td></tr><tr id="tr_needs"><td class="label">Special Needs</td><td id="needs" class="input"><textarea name="needs" cols="60" rows="10"></textarea></td></tr>
+<tr><td colspan="2"><hr></td></tr><tr>
+	<td class="label" colspan="2">Conditions for Registration - Please Read Carefully</td>
+</tr>
+
+<tr>
+	<td id="conditions" colspan="2">
+<ol>
+ 
+<li>Rites of Spring is a private function. It is off-limits to media 
+personnel acting in a professional capacity, unless consent from the 
+organization has been secured in writing. This is to ensure 
+confidentiality for those who desire it.</li>
+<li>Tamelin Productions reserves the right to revoke admission without 
+refund on an individual basis if necessary due to dangerous or 
+disruptive behavior or failure to abide by gathering policies.</li>
+<li>I have read and understand the full information booklet and/or web 
+site and I agree to the Rites of Spring policies and conditions for 
+registration, cancellation, refunds and  as described.</li>
+<li>I agree to be responsible for the behavior, safety and adherence to the above for all children listed on this registration form.</li>
+<li>I agree to hold harmless Tamelin Productions, EarthSpirit, their 
+members, staff and volunteers, and the owners and staff of the gathering
+ site from any responsibility for personal injury or loss or damage to 
+personal property incurred by myself or my children during Rites of 
+Spring.</li>
+</ol>
+	</td>
+</tr>
+
+<tr><td colspan="2"><hr></td></tr>
+
+<tr>
+	<td class="label" colspan="2">Waiver of Liability</td><td>
+</td></tr>
+
+<tr>
+<td id="waiver" colspan="2">
+I agree to the conditions for registration, cancellation, refunds, and 
+Rites of Spring policies as described above. I agree to read the full 
+information booklet or website before arrival.<br><input name="waiverSigned" type="checkbox">
+	</td>
+</tr>
+
+<tr><td colspan="2"><hr></td></tr>
+
+<tr>
+	<td class="label">Payment Method</td>
+	<td class="input"><select name="paymentType"><option selected="selected" value="N/A">select...</option><option>Check</option>
+<option>PayPal</option>
+<option>Money Order</option>
+<option>Financial Assistance</option>
+</select></td></tr>
+
+
+<tr>
+<td class="label">Scholarship Donation:<br>even $1 is helpful!</td>
+<td id="SCHFUND">$<input name="schfund" onchange="CalcAmountDue(false)" value="0" type="text">
+</td></tr>
+
+<tr>
+<td class="label">I have a discount code
+</td>
+<td><input name="discountCheckBox" onchange="toggleCoupon()" type="checkbox"><div id="CouponDiv" style="display:none">&nbsp;<input id="coupon" name="coupon" type="text">&nbsp;<a href="#" onclick="CheckCoupon(); return false;">Apply</a></div>
+</td>
+</tr>
+
+<tr>
+<td colspan="2"><button onclick="Register(); return false;">Click Here
+to register</button></td>
+</tr>
+
+<tr><td colspan="2">
+</td></tr>
+
+</tbody></table>
+
+	<input name="age" value="0" type="hidden">
+	<input name="ageCode" value="0" type="hidden">
+	<input name="page" value="register.php" type="hidden">
+	<input name="earlyBird" value="" type="hidden">
+	<input name="configFile" value="late_register.php" type="hidden">
+
+</form>
+<p class="footer">©2015 Tamelin Productions and EarthSpirit</p>
+
+
+	</div>
+</div>
+
+</body></html>

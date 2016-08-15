@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+		<title>AngularJS Test Page</title>
+
+		<!-- 
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+		-->
+		<script src="http://code.angularjs.org/1.5.7/angular.js"></script>
+		<script src="test.js"></script>
+
+	</head>
+
+	<body ng-app="MinTest">
+		<div>
+			<div ng-controller="RegController as reg">
+				Inside the RegController {{testValue}} RegOption={{formData.regOption}} awesome={{formData.awesome}}
+				<br>
+				MessageBlock [{{messageBlock}}]
+				<br>
+				ShowTotal [{{ShowTotal()}}]
+					<form name="REGISTER" action="confirm.php" method="POST" onsubmit="return false;">
+		<input value="1" id="regOption1" name="regOption" type="radio" ng-model="formData.regOption" ng-change='ReCalc()'>
+		<label for="regOption1">Full Rites of Spring (Wed to Mon)</label>&nbsp;
+		<span id="lblregOption1" name="lblregOption1">$299</span>
+		<br>
+		<input value="2" id="regOption2" name="regOption" type="radio" ng-model="formData.regOption" ng-change='ReCalc()'>
+		<label for="regOption2">Weekend Only (Fri to Mon)</label>&nbsp;
+		<span id="lblregOption2" name="lblregOption2">$230</span>
+		<br>
+		<input value="3" id="regOption3" name="regOption" type="radio" ng-model="formData.regOption" ng-change='ReCalc()'>
+		<label for="regOption3">Village Builders (with Full Rites of Spring)</label>&nbsp;
+		<span id="lblregOption3" name="lblregOption3">$399</span>
+		<br>
+		<!--
+		-->
+		<input type="checkbox" name="awesome" ng-model="formData.awesome" ng-true-value="'ofCourse'" ng-false-value="'iWish'"  ng-change='ReCalc()'>
+					</form>
+			</div>
+		</div>
+	</body>
+</html>
